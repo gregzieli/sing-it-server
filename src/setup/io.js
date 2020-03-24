@@ -1,15 +1,21 @@
 import socketIo from "socket.io";
-import { server } from "../app";
 
-const io = socketIo(server);
+const setupIo = server => {
+  const io = socketIo(server);
+  
+  io.on("connection", socket => {
+    console.log("a user connected");
+    socket.on("disconnect", onDisconnect);
+    socket.on('msg', msg => {
+      console.log('message: ' + msg);
+    });
+    socket.broadcast.emit("res", "another user connected")
+  });
+}
 
-io.on("connection", socket => {
-  console.log("a user connected");
-  socket.on("disconnect", onDisconnect);
-});
-
+  
 const onDisconnect = () => {
   console.log("user disconnected");
 };
 
-export default io;
+export default setupIo;
